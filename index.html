@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Who Are You, Really?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1c1c1c;
+    --paper: #f7f5f0;
+    --muted: #9a9690;
+    --line: #e2dfd8;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:var(--paper); color:var(--ink);
+    font-family:'Jost',sans-serif; font-weight:300;
+    min-height:100vh; display:flex;
+    align-items:center; justify-content:center;
+    padding:40px 24px;
+  }
+  .wrap { width:100%; max-width:540px; }
+  .screen { animation:up .55s ease both; }
+  @keyframes up {
+    from { opacity:0; transform:translateY(18px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .hidden { display:none !important; }
+
+  /* ── INTRO ── */
+  .eyebrow {
+    display:block; font-family:'Cormorant Garamond',serif;
+    font-style:italic; font-size:14px; color:var(--muted);
+    letter-spacing:1px; margin-bottom:22px;
+  }
+  h1 {
+    font-family:'Cormorant Garamond',serif; font-weight:300;
+    font-size:clamp(46px,10vw,70px); line-height:1.05;
+    letter-spacing:-1px; margin-bottom:26px;
+  }
+  .sub {
+    font-size:15px; line-height:1.95; color:var(--muted);
+    margin-bottom:52px; max-width:370px;
+  }
+  .btn {
+    background:var(--ink); color:var(--paper);
+    border:none; padding:14px 46px;
+    font-family:'Jost',sans-serif; font-size:12px;
+    font-weight:400; letter-spacing:2.5px;
+    text-transform:uppercase; cursor:pointer; transition:opacity .2s;
+  }
+  .btn:hover { opacity:.72; }
+  .hint { display:block; font-size:11px; color:var(--line); letter-spacing:1px; margin-top:20px; }
+
+  /* ── QUIZ ── */
+  .track { height:1px; background:var(--line); margin-bottom:9px; }
+  .fill  { height:100%; background:var(--ink); transition:width .55s ease; }
+  .meta  {
+    display:flex; justify-content:space-between;
+    font-size:11px; color:var(--muted); letter-spacing:1px; margin-bottom:50px;
+  }
+  .question {
+    font-family:'Cormorant Garamond',serif; font-weight:400;
+    font-size:clamp(22px,4vw,30px); line-height:1.4;
+    margin-bottom:30px;
+  }
+  .opts { display:flex; flex-direction:column; gap:9px; margin-bottom:30px; }
+  .opt {
+    background:transparent; border:1px solid var(--line);
+    color:var(--muted); text-align:left;
+    font-family:'Jost',sans-serif; font-size:13px;
+    font-weight:300; padding:13px 16px;
+    cursor:pointer; transition:all .15s; width:100%; line-height:1.5;
+  }
+  .opt:hover  { border-color:var(--ink); color:var(--ink); }
+  .opt.on     { background:var(--ink); border-color:var(--ink); color:var(--paper); }
+  .free-lbl   {
+    display:block; font-size:10px; letter-spacing:2px;
+    text-transform:uppercase; color:var(--line); margin-bottom:9px;
+  }
+  textarea {
+    width:100%; background:transparent; border:none;
+    border-bottom:1px solid var(--line);
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    font-size:17px; color:var(--ink); padding:8px 0;
+    outline:none; resize:none; transition:border-color .2s; line-height:1.65;
+  }
+  textarea:focus { border-bottom-color:var(--ink); }
+  textarea::placeholder { color:var(--line); }
+  .nav { display:flex; justify-content:flex-end; margin-top:34px; }
+  .btn-n {
+    background:var(--ink); color:var(--paper); border:none;
+    padding:12px 32px; font-family:'Jost',sans-serif;
+    font-size:11px; letter-spacing:2px; text-transform:uppercase;
+    cursor:pointer; transition:opacity .2s;
+  }
+  .btn-n:disabled {
+    background:transparent; color:var(--line);
+    border:1px solid var(--line); cursor:not-allowed;
+  }
+
+  /* ── LOADING ── */
+  .loading { text-align:center; }
+  .ring {
+    width:38px; height:38px;
+    border:1px solid var(--line); border-top-color:var(--ink);
+    border-radius:50%; animation:spin 1.1s linear infinite;
+    margin:0 auto 28px;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .loading h3 {
+    font-family:'Cormorant Garamond',serif; font-weight:300;
+    font-size:24px; margin-bottom:10px;
+  }
+  .loading p { font-size:13px; color:var(--muted); }
+
+  /* ── RESULT ── */
+  .r-eye {
+    display:block; font-family:'Cormorant Garamond',serif;
+    font-style:italic; font-size:13px; color:var(--muted);
+    letter-spacing:1px; margin-bottom:38px;
+  }
+  .body {
+    border-left:1px solid var(--ink);
+    padding-left:28px; margin-bottom:50px;
+  }
+  .body p {
+    font-family:'Cormorant Garamond',serif; font-weight:300;
+    font-size:clamp(17px,2.8vw,20px); line-height:2;
+    color:var(--ink); margin-bottom:26px;
+  }
+  .body p:last-child { font-style:italic; margin-bottom:0; }
+  .footer {
+    display:flex; justify-content:space-between; align-items:center;
+    border-top:1px solid var(--line); padding-top:22px;
+  }
+  .footer span { font-size:12px; color:var(--line); font-style:italic; }
+  .btn-g {
+    background:transparent; border:1px solid var(--line); color:var(--muted);
+    padding:11px 24px; font-family:'Jost',sans-serif;
+    font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+    cursor:pointer; transition:all .15s;
+  }
+  .btn-g:hover { border-color:var(--ink); color:var(--ink); }
+
+  /* ── ERROR ── */
+  .err { text-align:center; }
+  .err h3 {
+    font-family:'Cormorant Garamond',serif; font-size:28px;
+    font-weight:300; margin-bottom:12px;
+  }
+  .err p { font-size:14px; color:var(--muted); margin-bottom:30px; }
+  .brow { display:flex; gap:12px; justify-content:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- INTRO -->
+  <div id="s-intro" class="screen">
+    <span class="eyebrow">a mirror, not a quiz</span>
+    <h1>Who are<br>you, really?</h1>
+    <p class="sub">Ten questions. Choose an answer, then say what you actually feel. At the end, we'll tell you something about yourself you haven't quite put into words yet.</p>
+    <button class="btn" onclick="startQuiz()">Begin</button>
+    <span class="hint">Five minutes · Be honest · No judgement</span>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="s-quiz" class="screen hidden">
+    <div class="track"><div class="fill" id="bar" style="width:0%"></div></div>
+    <div class="meta">
+      <span id="qlabel">Question 1 of 10</span>
+      <span id="qpct">0%</span>
+    </div>
+    <p class="question" id="qtext"></p>
+    <div class="opts" id="opts"></div>
+    <span class="free-lbl">Your words (optional)</span>
+    <textarea id="typed" rows="2" placeholder="What you actually feel..."></textarea>
+    <div class="nav">
+      <button class="btn-n" id="nxt" onclick="goNext()" disabled>Next</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="s-loading" class="screen hidden loading">
+    <div class="ring"></div>
+    <h3>Reading between your lines</h3>
+    <p>This takes a moment. It should.</p>
+  </div>
+
+  <!-- RESULT -->
+  <div id="s-result" class="screen hidden">
+    <span class="r-eye">your reflection</span>
+    <div class="body" id="rbody"></div>
+    <div class="footer">
+      <span>Keep this. Re-read it sometime.</span>
+      <button class="btn-g" onclick="restart()">Start over</button>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div id="s-error" class="screen hidden err">
+    <h3>Something didn't connect.</h3>
+    <p>Your answers are saved. Tap retry and we'll try again.</p>
+    <div class="brow">
+      <button class="btn" onclick="generate()">Retry</button>
+      <button class="btn-g" onclick="restart()">Start over</button>
+    </div>
+  </div>
+
+</div>
+<script>
+const QS = [
+  { q:"When something goes wrong, what's your first instinct?", opts:["Fix it immediately","Understand why it happened","Talk to someone about it","Sit with it quietly first"], ph:"What usually goes through your mind..." },
+  { q:"What do you do with a compliment you receive?", opts:["Accept it genuinely","Deflect or make a joke","Question if it's true","Remember it for a long time"], ph:"How does it actually make you feel inside..." },
+  { q:"When you're alone, what do you think about most?", opts:["Things I want to achieve","People I care about","Mistakes I've made","What the future holds"], ph:"The thoughts that show up when no one's around..." },
+  { q:"How do you treat someone who can do nothing for you?", opts:["The same as anyone else","With extra kindness","I'm honest — it depends","I notice a difference in myself"], ph:"Be honest with yourself here..." },
+  { q:"What does 'being strong' mean to you?", opts:["Not showing weakness","Feeling everything and going on","Protecting people I love","Never asking for help"], ph:"Where did your idea of strength come from..." },
+  { q:"When was the last time you did something just for yourself?", opts:["Recently, I do it often","A while ago honestly","I struggle to do that","I don't really think about it"], ph:"What would you do if you allowed yourself to..." },
+  { q:"How do you feel when someone truly understands you?", opts:["Relieved","Vulnerable","That's rare — it doesn't happen often","Grateful but guarded"], ph:"What does being understood feel like for you..." },
+  { q:"What's something you keep doing even though you know you shouldn't?", opts:["Overthinking everything","Putting others before myself","Holding grudges quietly","Pretending I'm fine"], ph:"The habit you can't seem to shake..." },
+  { q:"If people knew the real you, what would surprise them most?", opts:["How much I actually care","How much doubt I carry","How different I am when comfortable","How little I need validation"], ph:"The part of you that rarely gets to show up..." },
+  { q:"What do you want most right now — honestly?", opts:["Peace","Progress","Connection","To be truly seen"], ph:"Not what you should want — what you actually want..." },
+];
+
+let cur=0, chosen=null, answers=[];
+
+function show(id) {
+  ['s-intro','s-quiz','s-loading','s-result','s-error'].forEach(s=>
+    document.getElementById(s).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function startQuiz() { cur=0; answers=[]; loadQ(); show('s-quiz'); }
+
+function loadQ() {
+  chosen=null;
+  const Q=QS[cur];
+  const pct=Math.round((cur/QS.length)*100);
+  document.getElementById('bar').style.width=pct+'%';
+  document.getElementById('qlabel').textContent='Question '+(cur+1)+' of '+QS.length;
+  document.getElementById('qpct').textContent=pct+'%';
+  document.getElementById('qtext').textContent=Q.q;
+  document.getElementById('typed').value='';
+  document.getElementById('typed').placeholder=Q.ph;
+  document.getElementById('nxt').disabled=true;
+  document.getElementById('nxt').textContent=cur===QS.length-1?'See My Reflection':'Next';
+
+  const c=document.getElementById('opts');
+  c.innerHTML='';
+  Q.opts.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='opt'; b.textContent=o;
+    b.onclick=()=>{
+      document.querySelectorAll('.opt').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      chosen=o;
+      document.getElementById('nxt').disabled=false;
+    };
+    c.appendChild(b);
+  });
+}
+
+function goNext() {
+  answers.push({
+    q: QS[cur].q,
+    choice: chosen,
+    note: document.getElementById('typed').value.trim()
+  });
+  if (cur < QS.length-1) { cur++; loadQ(); }
+  else generate();
+}
+
+function buildPrompt() {
+  const lines = answers.map((a,i)=>
+    `Q${i+1}: "${a.q}"\nChosen: "${a.choice}"` + (a.note ? `\nIn their own words: "${a.note}"` : '')
+  ).join('\n\n');
+  return `You are a deeply perceptive, warm, and honest personality reader. Someone just answered 10 introspective questions. Here are their answers:\n\n${lines}\n\nWrite a personal reflection in exactly 4 paragraphs:\n1. Who they are at their core — their dominant quality, how they move through the world\n2. What they quietly carry — a struggle they haven't fully named for themselves\n3. What they underestimate about themselves — a genuine strength they overlook\n4. One honest sentence: what they truly need right now\n\nAddress them directly as "you". Be warm but specific to THEIR answers — not generic. No headers, no bullets. Four paragraphs, blank line between each. Be real, not preachy.`;
+}
+
+async function generate() {
+  show('s-loading');
+  const prompt = buildPrompt();
+  let text = '';
+
+  for (let attempt=0; attempt<3; attempt++) {
+    try {
+      const res = await fetch('/api/reflect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await res.json();
+      text = data?.text || '';
+      if (text.length > 80) break;
+    } catch(e) {
+      console.error('Attempt', attempt+1, e.message);
+    }
+    await new Promise(r => setTimeout(r, 1200));
+  }
+
+  if (text.length > 80) showResult(text);
+  else show('s-error');
+}
+
+function showResult(text) {
+  const body = document.getElementById('rbody');
+  body.innerHTML = '';
+  text.split('\n\n').filter(p=>p.trim()).forEach(para=>{
+    const p = document.createElement('p');
+    p.textContent = para.trim();
+    body.appendChild(p);
+  });
+  show('s-result');
+}
+
+function restart() { cur=0; answers=[]; chosen=null; show('s-intro'); }
+</script>
+</body>
+</html>
